@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents Workshop Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.298.0/umd/lucide.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .card { transition: all 0.2s ease-in-out; }
+        .card:hover { transform: translateY(-2px); }
+        .icon { transition: color 0.2s ease-in-out; }
+        .nav-item:hover .icon { color: #4F46E5; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { Home, BookOpen, Code, Database, Brain, Settings, ChevronRight, ChevronDown } = lucide;
+
+        // Workshop content data structure (same as before)
+        const workshopContent = {
+            "Core AI Agent Architecture": {
+                icon: Settings,
+                sections: {
+                    "Foundation Components": {
+                        topics: {
+                            "Base Architecture": "Core system design principles and patterns for AI agents",
+                            "Memory Systems": "Short-term and long-term memory management for maintaining agent state",
+                            "State Management": "Handling agent state transitions and persistence",
+                            "Event Handling": "Processing and responding to system and external events"
+                        }
+                    },
+                    // ... (rest of the content structure)
+                }
+            },
+            // ... (other sections)
+        };
+
+        function Card({ children, className = "", onClick }) {
+            return (
+                <div onClick={onClick} className={`bg-white rounded-lg shadow-sm p-4 ${className}`}>
+                    {children}
+                </div>
+            );
+        }
+
+        function WorkshopExplorer() {
+            const [selectedModule, setSelectedModule] = useState(null);
+            const [selectedSection, setSelectedSection] = useState(null);
+            const [selectedTopic, setSelectedTopic] = useState(null);
+            const [expandedSections, setExpandedSections] = useState({});
+
+            // Navigation handlers (same as before)
+            const handleModuleClick = (moduleName) => {
+                setSelectedModule(moduleName);
+                setSelectedSection(null);
+                setSelectedTopic(null);
+            };
+
+            const toggleSection = (moduleName, sectionName) => {
+                setExpandedSections(prev => ({
+                    ...prev,
+                    [`${moduleName}-${sectionName}`]: !prev[`${moduleName}-${sectionName}`]
+                }));
+            };
+
+            return (
+                <div className="container mx-auto p-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        {/* Navigation Panel */}
+                        <div className="w-full md:w-1/3">
+                            <Card>
+                                <div className="flex items-center mb-4">
+                                    <Home className="w-6 h-6 mr-2 text-gray-600" />
+                                    <h2 className="text-xl font-bold">Workshop Explorer</h2>
+                                </div>
+                                
+                                {Object.entries(workshopContent).map(([moduleName, moduleData]) => (
+                                    <div key={moduleName} className="mb-4">
+                                        <button
+                                            className={`flex items-center w-full p-2 rounded text-left nav-item
+                                                ${selectedModule === moduleName ? 'bg-gray-100' : ''}`}
+                                            onClick={() => handleModuleClick(moduleName)}
+                                        >
+                                            {React.createElement(moduleData.icon, { 
+                                                className: "w-5 h-5 mr-2 icon text-gray-600" 
+                                            })}
+                                            <span>{moduleName}</span>
+                                        </button>
+                                    </div>
+                                ))}
+                            </Card>
+                        </div>
+
+                        {/* Content Display */}
+                        <div className="w-full md:w-2/3">
+                            <Card>
+                                {!selectedModule ? (
+                                    <div className="text-center p-8">
+                                        <h3 className="text-xl font-semibold mb-4">
+                                            Welcome to the AI Agents Workshop Explorer
+                                        </h3>
+                                        <p className="text-gray-600">
+                                            Select a module from the navigation panel to begin exploring the content.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="p-4">
+                                        <h3 className="text-2xl font-bold mb-4">
+                                            {selectedModule}
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {Object.entries(workshopContent[selectedModule].sections).map(([sectionName, section]) => (
+                                                <Card 
+                                                    key={sectionName}
+                                                    className="cursor-pointer hover:shadow-md"
+                                                >
+                                                    <h4 className="font-semibold mb-2">{sectionName}</h4>
+                                                    <p className="text-sm text-gray-600">
+                                                        {Object.keys(section.topics).length} topics
+                                                    </p>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<WorkshopExplorer />, document.getElementById('root'));
+    </script>
+</body>
+</html>
