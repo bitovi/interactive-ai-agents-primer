@@ -7,13 +7,10 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.464.0/dist/cjs/lucide.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         .card { transition: all 0.2s ease-in-out; }
         .card:hover { transform: translateY(-2px); }
-        .icon { transition: color 0.2s ease-in-out; }
-        .nav-item:hover .icon { color: #4F46E5; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -21,46 +18,11 @@
 
     <script type="text/babel">
         const { useState } = React;
-        
-        // Instead of destructuring, we'll create icon components using lucide.createIcons
-        const createIconComponent = (name) => {
-            return function IconComponent({ className }) {
-                const ref = React.useRef();
-                
-                React.useEffect(() => {
-                    // Clear any existing icons
-                    if (ref.current) {
-                        ref.current.innerHTML = '';
-                    }
-                    
-                    // Create the icon
-                    lucide.createIcons({
-                        icons: {
-                            [name]: true
-                        },
-                        nameAttr: 'icon-name',
-                        elements: [ref.current]
-                    });
-                }, []);
-
-                return <i ref={ref} icon-name={name} className={className}></i>;
-            };
-        };
-
-        // Create our icon components
-        const HomeIcon = createIconComponent('home');
-        const BookOpenIcon = createIconComponent('book-open');
-        const CodeIcon = createIconComponent('code');
-        const DatabaseIcon = createIconComponent('database');
-        const BrainIcon = createIconComponent('brain');
-        const SettingsIcon = createIconComponent('settings');
-        const ChevronRightIcon = createIconComponent('chevron-right');
-        const ChevronDownIcon = createIconComponent('chevron-down');
 
         // Workshop content data structure
         const workshopContent = {
             "Core AI Agent Architecture": {
-                icon: SettingsIcon,
+                icon: "⚙️",
                 sections: {
                     "Foundation Components": {
                         topics: {
@@ -70,13 +32,23 @@
                             "Event Handling": "Processing and responding to system and external events"
                         }
                     }
-                    // ... Additional sections would go here
+                }
+            },
+            "Strategic Implementation": {
+                icon: "🎯",
+                sections: {
+                    "Business Alignment": {
+                        topics: {
+                            "Value Proposition": "Defining and measuring business value",
+                            "Risk Assessment": "Identifying and mitigating potential risks",
+                            "ROI Analysis": "Calculating return on investment",
+                            "Success Metrics": "KPIs and measurement frameworks"
+                        }
+                    }
                 }
             }
-            // ... Additional modules would go here
         };
 
-        // Card component remains the same
         function Card({ children, className = "", onClick }) {
             return (
                 <div onClick={onClick} className={`bg-white rounded-lg shadow-sm p-4 ${className}`}>
@@ -89,11 +61,15 @@
             const [selectedModule, setSelectedModule] = useState(null);
             const [selectedSection, setSelectedSection] = useState(null);
             const [selectedTopic, setSelectedTopic] = useState(null);
-            const [expandedSections, setExpandedSections] = useState({});
 
             const handleModuleClick = (moduleName) => {
                 setSelectedModule(moduleName);
                 setSelectedSection(null);
+                setSelectedTopic(null);
+            };
+
+            const handleSectionClick = (sectionName) => {
+                setSelectedSection(sectionName);
                 setSelectedTopic(null);
             };
 
@@ -104,20 +80,18 @@
                         <div className="w-full md:w-1/3">
                             <Card>
                                 <div className="flex items-center mb-4">
-                                    <HomeIcon className="w-6 h-6 mr-2 text-gray-600" />
+                                    <span className="text-2xl mr-2">🏠</span>
                                     <h2 className="text-xl font-bold">Workshop Explorer</h2>
                                 </div>
                                 
                                 {Object.entries(workshopContent).map(([moduleName, moduleData]) => (
                                     <div key={moduleName} className="mb-4">
                                         <button
-                                            className={`flex items-center w-full p-2 rounded text-left nav-item
+                                            className={`flex items-center w-full p-2 rounded text-left
                                                 ${selectedModule === moduleName ? 'bg-gray-100' : ''}`}
                                             onClick={() => handleModuleClick(moduleName)}
                                         >
-                                            {React.createElement(moduleData.icon, { 
-                                                className: "w-5 h-5 mr-2 icon text-gray-600" 
-                                            })}
+                                            <span className="text-xl mr-2">{moduleData.icon}</span>
                                             <span>{moduleName}</span>
                                         </button>
                                     </div>
@@ -139,7 +113,8 @@
                                     </div>
                                 ) : (
                                     <div className="p-4">
-                                        <h3 className="text-2xl font-bold mb-4">
+                                        <h3 className="text-2xl font-bold mb-4 flex items-center">
+                                            <span className="text-2xl mr-2">{workshopContent[selectedModule].icon}</span>
                                             {selectedModule}
                                         </h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -147,6 +122,7 @@
                                                 <Card 
                                                     key={sectionName}
                                                     className="cursor-pointer hover:shadow-md"
+                                                    onClick={() => handleSectionClick(sectionName)}
                                                 >
                                                     <h4 className="font-semibold mb-2">{sectionName}</h4>
                                                     <p className="text-sm text-gray-600">
